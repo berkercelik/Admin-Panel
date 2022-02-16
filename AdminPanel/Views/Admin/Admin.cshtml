@@ -1,0 +1,100 @@
+﻿@model IEnumerable<AdminPanel.Models.Admin>
+@{
+    ViewData["Title"] = "Yöneticiler";
+    Layout = "_AdminLayout";
+}
+
+<button type="button" onclick="$('#AdminModal').modal('show')" class="btn btn-primary" style="margin-bottom:20px;">Admin Ekle</button>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Yönetici İsmi</th>
+            <th scope="col">Email</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <th scope="row">@item.Id</th>
+            <td>@item.AdminName</td>
+            <td>@item.Email</td>
+            <td>
+                <a class="btn btn-danger" asp-route-id="@item.Id" asp-action="DeleteAdmin">Sil</a>
+                <button class="btn btn-secondary" onclick="updateForm(@item.Id)" type="button">Güncelle</button>
+            </td>
+        </tr>
+        }
+    </tbody>
+
+</table>
+
+<div class="modal" id="AdminModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Admin: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/Admin/AddAdmin" method="POST" autocomplete="off">
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="Id" class="form-control" />
+                    <div class="form-group">
+                        <span>Name</span>
+                        <input type="text" name="AdminName" id="AdminName" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <span>Password</span>
+                        <input type="password" name="Password" id="Password" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <span>Email</span>
+                        <input type="text" name="Email" id="Email" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="clearForm()" data-dismiss="modal">İptal</button>
+                    <button type="submit" id="updateBtn" class="btn btn-primary">Güncelle</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        
+        function hide() {
+            document.getElementById("pass").readOnly;
+        }
+        function updateForm(Id) {
+            fetch('/Admin/AdminDetails?Id='+Id)
+                .then(res => res.json())
+                .then(res => {
+                $('#Id').val(res.id)
+                $('#AdminName').val(res.adminName)
+                $('#Password').val(res.password)
+                $('#Email').val(res.email)
+                console.log(res);
+            })
+            $('#saveBtn').hide();
+            $('#updateBtn').show();
+            $('#AdminModal').modal('show');
+        }
+        function clearForm() {
+            $('#Id').val(null)
+            $('#AdminName').val(null)
+            $('#AdminName').val(null)
+            $('#Password').val(null)
+            $('#Email').val(null)
+            $('#saveBtn').show();
+            $('#updateBtn').hide();
+        }
+    </script>
+}

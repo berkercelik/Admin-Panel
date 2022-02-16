@@ -1,0 +1,82 @@
+﻿@model IEnumerable<AdminPanel.Models.Sort>
+@{
+    ViewData["Title"] = "Türler";
+    Layout = "_AdminLayout";
+}
+
+<button type="button" onclick="$('#SortModal').modal('show')" class="btn btn-primary" style="margin-bottom:20px;">Tür Ekle</button>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">SortId</th>
+            <th scope="col">PageName</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <th scope="row">@item.SortId</th>
+                <td>@item.PageName</td>
+                <td>
+                    <a class="btn btn-danger" asp-route-id="@item.SortId" asp-action="DeleteSort">Sil</a>
+                    <button class="btn btn-secondary" onclick="updateForm(@item.SortId)" type="button">Güncelle</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal" id="SortModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sayfa: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/Admin/AddSort" method="POST" autocomplete="off">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="hidden" name="SortId" id="SortId"  class="form-control" />
+                        <input type="text" name="PageName" id="PageName" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger"  onclick="clearForm()" data-dismiss="modal">İptal</button>
+                    <button type="submit" id="saveBtn" class="btn btn-primary">Tür Ekle</button>
+                    <button type="submit" id="updateBtn" class="btn btn-primary">Güncelle</button>
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{ 
+    <script>
+        $(() => clearForm())
+        function updateForm(SortId) {
+            clearForm()
+            fetch('/Admin/SortDetails?SortId='+SortId)
+                .then(res => res.json())
+                .then(res => {
+                $('#SortId').val(res.sortId)
+                $('#PageName').val(res.pagename)
+                console.log(res);
+            })
+            $('#saveBtn').hide();
+            $('#updateBtn').show();
+            $('#SortModal').modal('show');
+        }
+        function clearForm() {
+            $('#SortId').val(null)
+            $('#PageName').val(null)
+            $('#saveBtn').show();
+            $('#updateBtn').hide();
+        }
+    </script>
+}

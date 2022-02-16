@@ -1,0 +1,115 @@
+﻿@model IEnumerable<AdminPanel.Models.Page>
+@using AdminPanel.Models
+
+@{
+    ViewData["Title"] = "Sayfalar";
+    Layout = "_AdminLayout";
+
+}
+<!DOCTYPE html>
+<html>
+<body>
+
+    <table class="table table-hover" style="margin-bottom:45px;">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Sayfa Başlığı</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <th scope="row">@item.PageId</th>
+                    <td>@item.Title</td>
+
+                    <td>
+                        @if (item.IsPublish)
+                        {
+                            <a class="btn btn-light" asp-route-id="@item.PageId" asp-action="RemoveFromMain">Yayından Kaldır</a>
+
+                        }
+                        else
+                        {
+                            <a class="btn btn-light" asp-route-id="@item.PageId" asp-action="SaveToMain">Yayınla</a>
+                        }
+                    </td>
+                    <td>
+                        <div class="btn-group-toggle">
+                            <a class="btn btn-primary" asp-route-id="@item.PageId" asp-action="EditPage">   Güncelle</a>
+                            <br />
+                            <a class="btn btn-danger" asp-route-id="@item.PageId" asp-action="DeletePage">Sil</a>                           
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+    
+    <div class="modal" id="PageModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sayfa Düzenle: </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/Page/UpdatePage" method="POST" autocomplete="off">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <span>Sayda Id'si</span>
+                            @Html.TextBoxFor(item => item, new { @id = "PageId", @name = "PageId", @class = "form-control", @readonly = "readonly" })
+                            <input type="text" name="PageId" id="PageId" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <span>Title</span>
+                            <input type="text" name="Title" id="Title" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <span>Subtitle</span>
+                            <input type="text" name="Subtitle" id="Subtitle" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" onclick="" data-dismiss="modal">İptal</button>
+                        <button type="submit" id="updateBtn" class="btn btn-primary">Güncelle</button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#summernote').summernote();
+
+        });
+        function updateForm(PageId) {
+            var page = PageId.value
+            var title = Title.value
+            var subtit = Subtitle.value
+            fetch('/Page/Update?PageId=' + PageId)            
+                .then(res => res.json())
+                .then(res => {
+                $('#PageId').val(res.page)
+                $('#Title').val(res.title)
+                $('#Subtitle').val(res.subtit)
+            })
+            $('#updateBtn').show();
+            $('#PageModal').modal('show');
+        }
+
+    </script>
+}
+
+
+@*$('#Content').val(res.content)*@

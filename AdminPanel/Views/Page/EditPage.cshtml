@@ -1,0 +1,84 @@
+﻿@model AdminPanel.Models.Page
+@using static AdminPanel.Models.Sort
+
+@{
+    ViewData["Title"] = "Sayfalar";
+    Layout = "_AdminLayout";
+
+}
+<!DOCTYPE html>
+
+<button class="btn btn-secondary" onclick="updateForm(@Model.PageId)" type="button">İçerik Düzenle</button>
+
+<div class="modal" id="PageModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">İçerik Düzenle: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/Page/UpdatePage" method="POST" autocomplete="off" style="padding-left:25px; padding-right:25px">
+                <input type="hidden" asp-for="PageId" value="@Model.PageId" />
+
+                <div class="input-group mb-5" style="margin-top:20px;">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">İçerik</span>
+                    </div>
+                    <textarea id="summernote" asp-for="Content">@Model.Content</textarea>
+                </div>
+                <div class="input-group mb-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Başlık</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Username" aria-label="Title" aria-describedby="basic-addon1" asp-for="Title" value="@Model.Title">
+                </div>
+                <div class="input-group mb-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Alt Başlık</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Username" aria-label="Subtitle" aria-describedby="basic-addon1" asp-for="Subtitle" value="@Model.Subtitle">
+                </div>
+                <div class="input-group mb-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Sayfa Türü</span>
+                    </div>
+                    @Html.DropDownList("Sorts", null, "Bir sayfa türü seçiniz" , new { @class="form-control", @id="IdofSort", @name="IdofSort"})
+                    @Html.HiddenFor(x => x.IdofSort, new { @class="form-control" })
+                </div>                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">İptal</button>
+                    <button type="submit" id="updateBtn" class="btn btn-primary">Güncelle</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    
+    <script src="~/lib/summernote-0.8.18-dist/summernote.min.js"></script>
+    <script type="text/javascript">
+        $(() => updateForm(PageId))
+        $(document).ready(function () {
+            $('#summernote').summernote();
+
+        });
+        function updateForm(PageId) {
+            var sortid = document.getElementById("Sorts");
+            fetch('/Page/Update?PageId=' + PageId)
+                .then(res => res.json())
+                .then(res => {
+                    $('#Content').val(res.summernote)
+                    $('#PageId').val(res.pageId)
+                    $('#IdofSort').val(document.getElementById("Sorts"))
+                })
+            $('#updateBtn').show();
+            $('#PageModal').modal('show');
+        }
+
+    </script>
+}
